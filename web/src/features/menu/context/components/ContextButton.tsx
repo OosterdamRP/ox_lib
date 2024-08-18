@@ -1,4 +1,4 @@
-import { Button, createStyles, Group, HoverCard, Image, Progress, Stack, Text } from '@mantine/core';
+import { Button, createStyles, Group, HoverCard, Image, Progress, Stack, Text, useMantineTheme } from '@mantine/core';
 import ReactMarkdown from 'react-markdown';
 import { ContextMenuProps, Option } from '../../../../typings';
 import { fetchNui } from '../../../../utils/fetchNui';
@@ -6,6 +6,7 @@ import { isIconUrl } from '../../../../utils/isIconUrl';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import MarkdownComponents from '../../../../config/MarkdownComponents';
 import LibIcon from '../../../../components/LibIcon';
+import { filterProps } from 'framer-motion';
 
 const openMenu = (id: string | undefined) => {
   fetchNui<ContextMenuProps>('openContext', { id: id, back: false });
@@ -21,15 +22,19 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
   },
   label: {
     width: '100%',
-    color: params.disabled ? theme.colors.dark[3] : theme.colors.dark[0],
+    color: params.disabled ? theme.colors[theme.primaryColor][0] : theme.colors.dark[0],
     whiteSpace: 'pre-wrap',
+    fontSize: 16,
+    fontWeight: 400,
   },
   button: {
     height: 'fit-content',
     width: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    opacity: params.disabled ? 1 : 1,
     padding: 10,
     '&:hover': {
-      backgroundColor: params.readOnly ? theme.colors.dark[6] : undefined,
+      backgroundColor: params.readOnly ? 'rgba(0, 0, 0, 1)' : 'rgba(0, 0, 0, 1)',
       cursor: params.readOnly ? 'unset' : 'pointer',
     },
     '&:active': {
@@ -40,40 +45,51 @@ const useStyles = createStyles((theme, params: { disabled?: boolean; readOnly?: 
     maxWidth: '25px',
   },
   description: {
-    color: params.disabled ? theme.colors.dark[3] : theme.colors.dark[2],
-    fontSize: 12,
+    color: params.disabled ? theme.colors[theme.primaryColor][3] : theme.colors.dark[0],
+    fontSize: 15,
+    fontWeight: 300,
   },
   dropdown: {
     padding: 10,
     color: theme.colors.dark[0],
-    fontSize: 14,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    fontSize: 16,
     maxWidth: 256,
     width: 'fit-content',
     border: 'none',
   },
   buttonStack: {
-    gap: 4,
+    gap: 8,
     flex: '1',
   },
   buttonGroup: {
-    gap: 4,
+    gap: 8,
     flexWrap: 'nowrap',
   },
   buttonIconContainer: {
-    width: 25,
-    height: 25,
+    minWidth: '45px',
+    height: '45px',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    borderRadius: theme.radius.sm,
     justifyContent: 'center',
     alignItems: 'center',
+    color: params.disabled ? theme.colors[theme.primaryColor][theme.fn.primaryShade()] : theme.colors[theme.primaryColor][theme.fn.primaryShade()],
   },
   buttonTitleText: {
     overflowWrap: 'break-word',
+    color: params.disabled ? theme.colors[theme.primaryColor][2] : '#fff',
   },
   buttonArrowContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: 25,
+    padding: 0,
+    width: 10,
     height: 25,
+    color: 'white',
   },
+  icon: {
+    // filter: `drop-shadow(0 0 5px ${theme.colors[theme.primaryColor][theme.fn.primaryShade()]})`,
+  }
 }));
 
 const ContextButton: React.FC<{
@@ -81,6 +97,8 @@ const ContextButton: React.FC<{
 }> = ({ option }) => {
   const button = option[1];
   const buttonKey = option[0];
+  const theme = useMantineTheme();
+
   const { classes } = useStyles({ disabled: button.disabled, readOnly: button.readOnly });
 
   return (
@@ -113,24 +131,30 @@ const ContextButton: React.FC<{
                           <img src={button.icon} className={classes.iconImage} alt="Missing img" />
                         ) : (
                           <LibIcon
+                            className={classes.icon}
                             icon={button.icon as IconProp}
                             fixedWidth
                             size="lg"
-                            style={{ color: button.iconColor }}
+                            style={{
+                              color: button.iconColor,
+                              filter: `drop-shadow(0 0 5px ${button.iconColor? button.iconColor : theme.colors[theme.primaryColor][theme.fn.primaryShade()]})`,
+                            }}
                             animation={button.iconAnimation}
                           />
                         )}
                       </Stack>
                     )}
+                    <div>
                     <Text className={classes.buttonTitleText}>
                       <ReactMarkdown components={MarkdownComponents}>{button.title || buttonKey}</ReactMarkdown>
                     </Text>
+                    {button.description && (
+                      <Text className={classes.description}>
+                        <ReactMarkdown components={MarkdownComponents}>{button.description}</ReactMarkdown>
+                      </Text>
+                    )}
+                    </div>
                   </Group>
-                )}
-                {button.description && (
-                  <Text className={classes.description}>
-                    <ReactMarkdown components={MarkdownComponents}>{button.description}</ReactMarkdown>
-                  </Text>
                 )}
                 {button.progress !== undefined && (
                   <Progress value={button.progress} size="sm" color={button.colorScheme || 'dark.3'} />

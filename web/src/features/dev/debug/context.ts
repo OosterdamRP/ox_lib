@@ -6,7 +6,11 @@ export const debugContext = () => {
     {
       action: 'showContext',
       data: {
-        title: 'Vehicle garage',
+        title: 'mri Qbox Brasil',
+        background: true,
+        menu: 'teste',
+        // backgroundColor: 'blue',
+        description: "Teste Brasil",
         options: [
           { title: 'Empty button' },
           {
@@ -65,8 +69,9 @@ export const debugContext = () => {
             icon: 'bars',
             menu: 'other_example_menu',
             arrow: false,
-            description: 'Takes you to another menu',
+            description: 'Takes you to another menu             asdasda dasd           asdasd           asdadsad',
             metadata: ['It also has metadata support'],
+            readOnly: true,
           },
           {
             title: 'Event button',
